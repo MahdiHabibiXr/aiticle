@@ -2,11 +2,11 @@ from pyrogram import Client, filters
 from PIL import Image 
 import os
 from pyrogram.types import ReplyKeyboardMarkup as Markup
-from models import upload, tryon
+from models import upload, tryon, clarity_upscale
 import requests
 from io import BytesIO
 from pyrogram.types import (InlineKeyboardMarkup, InlineKeyboardButton)
-
+import db
 
 # bot_api = '6752497249:AAE_1UP_pVxNd3vMsKXnIA6QEbvIGRplUfU'
 # bot = Client('mahdi',api_id=863373,api_hash='c9f8495ddd20615835d3fd073233a3f6')
@@ -31,10 +31,18 @@ async def is_joined(app , user_id):
 @bot.on_message(filters.command("start"))
 async def start_text(client, message):
     not_joined_channels = await is_joined(bot , message.from_user.id)
-    if not_joined_channels:   
+    t_id = message.chat_id
+
+    #TODO: Check if its invited and add it to db
+
+    #check if user exists
+    if(db.user_exists(t_id)):
+        db.add_user(t_id)
+
+    if not_joined_channels:
         await message.reply("🌹سلام دوست عزیز به این ربات خوش اومدی\n👈به کمک این ربات میتونی با هوش‌مصنوعی، عکسهات رو بازسازی کنی\n\nلطفا برای فعالسازی ربات، اول در این کانالها جوین شو و بعدش دوباره روی /start کلیک کن"
                             +'\n\n' + links[0] + '    ' + links[1])
-    else:
+    else:        
         await message.reply("😍تبریک میگم، حالا میتونی از قابلیت‌های ربات استفاده کنی، اول عکسی که میخوای به هوش‌مصنوعی بدی رو آپلود کن :")
 
 
@@ -78,48 +86,27 @@ async def callbacks(client, callback_query):
     chat_id = callback_query.from_user.id
     photo = f'{inp_dir}{chat_id}.jpg'
     
-    if(os.path.exists(photo)):
-        if(data == 'creative_upscale'):
-            await callback_query.answer("✅درخواست شما ثبت شد", show_alert = False)
-            await client.delete_message(chat_id, message.id)
-            url = upload(photo)
-            #TODO Add image url to DB
-            await client.send_message(chat_id,url)
+    if(db.user_exists(chat_id)):
+        if(db.get_user(chat_id)[9] != 'COMPLETED'):
+            if(os.path.exists(photo)):
+                if(data == 'creative_upscale'):
+                    await callback_query.answer("✅درخواست شما ثبت شد", show_alert = False)
+                    await client.delete_message(chat_id, message.id)
+
+                    url = upload(photo)
+                    db.update_user(chat_id, 'image_path', url)
+
+                    req_id = clarity_upscale(url)
+                    db.add_request(req_id, chat_id)
+                    await message.reply("✅درخواست شما ثبت شد\nلطفا کمی منتظر باشید.")
+                    
+            else:
+                await client.send_message(chat_id, 'لطفا اول یک عکس آپلود کنید')
+        else : 
+            await message.reply('شما یک درخواست در حال انجام دارید، تا پایان درخواست قبلی، نمی‌توانید درخواست جدیدی ثبت کنید.\nلطفا کمی منتظر باشید🙏')
     else:
-        await client.send_message(chat_id, 'لطفا اول یک عکس آپلود کنید')
+        await message.reply('شما هنوز در این ربات ثبت نام نکرده اید. از این دستور برای شروع ربات استفاده کنید /start')
 
-
-
-@bot.on_message(filters.private & filters.photo)
-async def image(client, message):
-    chat_id = message.chat.id
-
-    user_root = f'{root}{chat_id}/'
-    file_name = ''
-    
-    
-    if(os.path.exists(f'{user_root}person.jpg') and os.path.exists(f'{user_root}garment.jpg')):
-        #both photos are sent
-        await message.reply('You have submitted person and garment images before\nto submit new images, Use the commans: /edit')
-    else:
-        if(not os.path.isdir(user_root)):
-            #first time sending photo so we create the user dir
-            os.makedirs(user_root)
-            file_name = 'person.jpg'
-            await message.reply('Person image submitted, Now send me a upper body garment image.')
-
-        elif(not os.path.exists(f'{user_root}person.jpg') and not os.path.exists(f'{user_root}garment.jpg')):
-            #sent person photo
-            file_name = 'person.jpg'
-            await message.reply('Person image submitted, Now send me a upper body garment image.')
-
-        elif(os.path.exists(f'{user_root}person.jpg') and not os.path.exists(f'{user_root}garment.jpg')):
-            #sent garment
-            file_name = 'garment.jpg'
-            await message.reply('Ok now use the command /imagine_upper (for upperbody garment) or /imagine_lower (for lowerbody garment) or /imagine_dress (for dress garment) and describe the garment in order to generate the photo, example \n /imagine_upper black t shirt')
-        
-            
-        file = await client.download_media(message.photo.file_id, file_name = f'{user_root}{file_name}')
 
 @bot.on_message(filters.private & filters.regex('/edit'))
 async def edit_image(client, message):

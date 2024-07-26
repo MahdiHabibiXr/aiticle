@@ -63,13 +63,60 @@ def change_api(key):
 #TODO: I should get the remaining credit of any api
 #def get_credit(key):
     
-def upscale(img):
-    result = fal_client.run(
+def clarity_upscale(img):
+    handler = fal_client.submit(
         "fal-ai/clarity-upscaler",
         arguments={
             "image_url": img
         },
     )
-    return result['image']['url']
+    return handler.request_id
+    # return result['image']['url']
+
+
+def tryon_sub():
+    handler = fal_client.submit(
+        "fal-ai/idm-vton",
+        arguments={
+            "human_image_url": "https://idm-vton.github.io/inthewild/4/h/0.jpeg",
+            "garment_image_url": "https://idm-vton.github.io/inthewild/4/c2/c2.jpeg",
+            "description": "Short Sleeve Round Neck T-shirts"
+        },
+    )
+
+    return handler
+
+
+def get_status(model_id, req_id):
+    fal_key = api
+    url = f'https://queue.fal.run/fal-ai/{model_id}/requests/{req_id}/status'
+    headers = {
+        'Authorization': f'Key {fal_key}'
+    }
+
+    response = requests.get(url, headers=headers)
+
+    if response.status_code == 200:
+        print('Success!')
+        return response.json()
+    else:
+        print(f'Failed to retrieve data: {response.status_code}')
+        return response.text
+
+def get_result(model_id, req_id):
+    fal_key = api
+    url = f'https://queue.fal.run/fal-ai/{model_id}/requests/{req_id}'
+    headers = {
+        'Authorization': f'Key {fal_key}'
+    }
+
+    response = requests.get(url, headers=headers)
+
+    if response.status_code == 200:
+        print('Success!')
+        return response.json()
+    else:
+        print(f'Failed to retrieve data: {response.status_code}')
+        return response.text
 
 
