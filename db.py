@@ -11,7 +11,7 @@ from psycopg2 import sql
 
 conn_params = {
     'dbname': 'studaio1_aiticle',
-    'user': 'studaio1',
+    'user': 'studaio1_postgres',
     'password': 'hMOz==@d)*$#',
     'host': 'localhost',  # e.g., 'localhost'
     'port': '5432'   # e.g., '5432'
