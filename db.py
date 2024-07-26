@@ -19,6 +19,7 @@ conn_params = {
 
 def add_user(t_id, ref_id=''):
     try:
+        t_id = str(t_id)
         # Connect to your PostgreSQL database
         conn = psycopg2.connect(**conn_params)
         # Create a cursor object
@@ -49,6 +50,7 @@ def add_user(t_id, ref_id=''):
 
 def add_request(req_id, t_id):
     try:
+        t_id = str(t_id)
         # Connect to your PostgreSQL database
         conn = psycopg2.connect(**conn_params)
         # Create a cursor object
@@ -79,7 +81,8 @@ def add_request(req_id, t_id):
 
 def get_user(t_id):
     try:
-    # Connect to your PostgreSQL database
+        t_id = str(t_id)
+        # Connect to your PostgreSQL database
         conn = psycopg2.connect(**conn_params)
         # Create a cursor object
         cursor = conn.cursor()
@@ -139,6 +142,7 @@ def get_request(req_id):
 
 def update_user(t_id, column_name, value):
     try:
+        t_id = str(t_id)
         # Connect to your PostgreSQL database
         conn = psycopg2.connect(**conn_params)
         # Create a cursor object
@@ -189,6 +193,7 @@ def update_request(req_id, column_name, value):
 
 def null(t_id, column_name, conn_params):
     try:
+        t_id = str(t_id)
         table_name = 'users'
         # Connect to your PostgreSQL database
         conn = psycopg2.connect(**conn_params)
@@ -215,6 +220,7 @@ def null(t_id, column_name, conn_params):
 
 def user_exists(t_id):
     try:
+        t_id = str(t_id)
         # Connect to your PostgreSQL database
         conn = psycopg2.connect(**conn_params)
         # Create a cursor object
