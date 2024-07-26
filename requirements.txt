@@ -1,0 +1,6 @@
+TgCrypto
+pyrogram
+pillow
+fal-client
+requests
+psycopg2-binary

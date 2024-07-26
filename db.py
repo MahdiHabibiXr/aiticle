@@ -1,0 +1,124 @@
+import psycopg2
+from psycopg2 import sql
+
+conn_params = {
+    'dbname': 'aiticle',
+    'user': 'postgres',
+    'password': 'Y4z#inab',
+    'host': 'localhost',  # e.g., 'localhost'
+    'port': '5432'   # e.g., '5432'
+}
+table_name = 'users'
+
+def add(t_id, ref_id=''):
+    try:
+        # Connect to your PostgreSQL database
+        conn = psycopg2.connect(**conn_params)
+        # Create a cursor object
+        cursor = conn.cursor()
+
+        # Define the insert query and data
+        insert_query = """
+        INSERT INTO users (t_id, ref_id)
+        VALUES (%s, %s);
+        """
+        data_to_insert = (t_id, ref_id)
+
+        # Execute the insert query
+        cursor.execute(insert_query, data_to_insert)
+
+        # Commit the transaction
+        conn.commit()
+
+        print("Data inserted successfully")
+
+        # Remember to close the cursor and connection
+        cursor.close()
+        conn.close()
+        print("PostgreSQL connection is closed")
+
+    except (Exception, psycopg2.Error) as error:
+        print("Error while connecting to PostgreSQL", error)
+
+def get(t_id):
+    try:
+    # Connect to your PostgreSQL database
+        conn = psycopg2.connect(**conn_params)
+        # Create a cursor object
+        cursor = conn.cursor()
+
+        # Define the select query
+        select_query = "SELECT * FROM users WHERE t_id = %s;"
+
+        # Execute the select query
+        cursor.execute(select_query, (t_id,))
+
+        # Fetch all the records
+        records = cursor.fetchall()
+
+        # Print the records
+        for row in records:
+            print(row)
+
+        # Remember to close the cursor and connection
+        cursor.close()
+        conn.close()
+        print("PostgreSQL connection is closed")
+
+        return records[0]
+
+    except (Exception, psycopg2.Error) as error:
+        print("Error while connecting to PostgreSQL", error)
+
+def update(t_id, column_name, value):
+    try:
+        # Connect to your PostgreSQL database
+        conn = psycopg2.connect(**conn_params)
+        # Create a cursor object
+        cursor = conn.cursor()
+
+        # Construct the SQL query dynamically
+        query = f"UPDATE {table_name} SET {column_name} = %s WHERE t_id = %s"
+
+        # Execute the query with the provided value and t_id
+        cursor.execute(query, (value, t_id))
+
+        # Commit the transaction
+        conn.commit()
+
+        print(f"Value '{value}' added to column '{column_name}' in table '{table_name}' for t_id '{t_id}'")
+
+        # Close the cursor and connection
+        cursor.close()
+        conn.close()
+
+    except (Exception, psycopg2.Error) as error:
+        print(f"Error while connecting to PostgreSQL: {error}")
+
+def null(t_id, column_name, conn_params):
+    try:
+        # Connect to your PostgreSQL database
+        conn = psycopg2.connect(**conn_params)
+        # Create a cursor object
+        cursor = conn.cursor()
+
+        # Construct the SQL query dynamically
+        query = f"UPDATE {table_name} SET {column_name} = NULL WHERE t_id = %s"
+
+        # Execute the query with the provided t_id
+        cursor.execute(query, (t_id,))
+
+        # Commit the transaction
+        conn.commit()
+
+        print(f"Column '{column_name}' set to NULL in table '{table_name}' for t_id '{t_id}'")
+
+        # Close the cursor and connection
+        cursor.close()
+        conn.close()
+
+    except (Exception, psycopg2.Error) as error:
+        print(f"Error while connecting to PostgreSQL: {error}")
+
+# add_user('274859', 'img/ai/im.png', '123456', 0)
+# get_user('274859')
