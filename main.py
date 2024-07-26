@@ -31,7 +31,7 @@ async def is_joined(app , user_id):
 @bot.on_message(filters.command("start"))
 async def start_text(client, message):
     not_joined_channels = await is_joined(bot , message.from_user.id)
-    t_id = message.chat_id
+    t_id = message.chat.id
 
     #TODO: Check if its invited and add it to db
 
