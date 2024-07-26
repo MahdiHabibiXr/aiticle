@@ -173,7 +173,7 @@ def update_request(req_id, column_name, value):
         query = f"UPDATE requests SET {column_name} = %s WHERE req_id = %s"
 
         # Execute the query with the provided value and t_id
-        cursor.execute(query, (value, t_id))
+        cursor.execute(query, (value, req_id))
 
         # Commit the transaction
         conn.commit()
@@ -189,6 +189,7 @@ def update_request(req_id, column_name, value):
 
 def null(t_id, column_name, conn_params):
     try:
+        table_name = 'users'
         # Connect to your PostgreSQL database
         conn = psycopg2.connect(**conn_params)
         # Create a cursor object
