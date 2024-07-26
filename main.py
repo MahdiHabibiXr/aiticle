@@ -37,7 +37,7 @@ async def start_text(client, message):
 
     #check if user exists
     if(db.user_exists(t_id)):
-        db.add_user(t_id)
+        await message.reply('You are a new user')
 
     if not_joined_channels:
         await message.reply("🌹سلام دوست عزیز به این ربات خوش اومدی\n👈به کمک این ربات میتونی با هوش‌مصنوعی، عکسهات رو بازسازی کنی\n\nلطفا برای فعالسازی ربات، اول در این کانالها جوین شو و بعدش دوباره روی /start کلیک کن"
