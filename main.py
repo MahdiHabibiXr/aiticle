@@ -87,7 +87,7 @@ async def callbacks(client, callback_query):
     photo = f'{inp_dir}{chat_id}.jpg'
     
     if(db.user_exists(chat_id)):
-        if(db.get_user(chat_id)[9] != 'COMPLETED'):
+        if(db.get_user(chat_id)[7] != 'COMPLETED'):
             if(os.path.exists(photo)):
                 if(data == 'creative_upscale'):
                     await callback_query.answer("✅درخواست شما ثبت شد", show_alert = False)
