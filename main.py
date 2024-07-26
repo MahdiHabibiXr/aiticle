@@ -91,7 +91,7 @@ async def callbacks(client, callback_query):
             if(os.path.exists(photo)):
                 if(data == 'creative_upscale'):
                     await callback_query.answer("✅درخواست شما ثبت شد", show_alert = False)
-                    await client.delete_message(chat_id, message.id)
+                    await message.delete()
 
                     url = upload(photo)
                     db.update_user(chat_id, 'image_path', url)
