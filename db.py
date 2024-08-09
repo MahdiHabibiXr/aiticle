@@ -14,7 +14,7 @@ conn_params = {
     'user': 'postgres',
     'password': '84SnN3BpiA6EA6V9ZBoXxAQRCeNC3hoJ',
     'host': '4887c511-d402-4b4f-b7d4-ab33742a7d8d.hsvc.ir',  # e.g., 'localhost'
-    'port': '5432'   # e.g., '5432'
+    'port': '31676'   # e.g., '5432'
 }
 
 def add_user(t_id, ref_id=''):
