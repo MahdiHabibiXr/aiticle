@@ -10,9 +10,12 @@ import db
 
 # bot_api = '6752497249:AAE_1UP_pVxNd3vMsKXnIA6QEbvIGRplUfU'
 # bot = Client('mahdi',api_id=863373,api_hash='c9f8495ddd20615835d3fd073233a3f6')
-
 inp_dir = 'inputs/'
+os.makedirs(inp_dir)
+
 out_dir = 'outputs/'
+os.makedirs(out_dir)
+
 root=''
 bot = Client('mahdi')
 
