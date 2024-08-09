@@ -10,11 +10,11 @@ from psycopg2 import sql
 # }
 
 conn_params = {
-    'dbname': 'studaio1_aiticle',
-    'user': 'studaio1_postgres',
-    'password': 'hMOz==@d)*$#',
-    'host': 'localhost',  # e.g., 'localhost'
-    'port': '5432'   # e.g., '5432'
+    'dbname': 'postgres',
+    'user': 'postgres',
+    'password': '84SnN3BpiA6EA6V9ZBoXxAQRCeNC3hoJ',
+    'host': '4887c511-d402-4b4f-b7d4-ab33742a7d8d.hsvc.ir',  # e.g., 'localhost'
+    'port': '30331'   # e.g., '5432'
 }
 
 def add_user(t_id, ref_id=''):
