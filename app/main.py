@@ -14,7 +14,6 @@ inp_dir = 'inputs/'
 # os.makedirs(inp_dir)
 
 out_dir = 'outputs/'
-os.makedirs(out_dir)
 
 root=''
 bot = Client('mahdi')

@@ -15,7 +15,7 @@ data = {
 
 # Define the proxies
 proxies = {
-    "http": "fodev.org:8118",
+    "http": "haproxy-httpproxy.infra.svc.cluster.local:1080",
 }
 
 # Make the POST request through the proxy
