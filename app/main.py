@@ -2,7 +2,7 @@ from pyrogram import Client, filters
 from PIL import Image 
 import os
 from pyrogram.types import ReplyKeyboardMarkup as Markup
-from models import upload, tryon, clarity_upscale
+from models import upload, clarity_upscale, credits
 import requests
 from io import BytesIO
 from pyrogram.types import (InlineKeyboardMarkup, InlineKeyboardButton)
@@ -99,9 +99,11 @@ async def callbacks(client, callback_query):
 
                     url = upload(photo)
                     db.update_user(chat_id, 'image_path', url)
+                    db.update_user(chat_id, 'in_progress', True)
 
-                    req_id = clarity_upscale(url)
-                    db.add_request(req_id, chat_id)
+                    # req_id, key = clarity_upscale(url)
+                    # db.add_request(req_id, chat_id)
+                    db.add_job(chat_id, 'clarity')
                     await message.reply("✅درخواست شما ثبت شد\nلطفا کمی منتظر باشید.")
                     
             else:
@@ -112,125 +114,11 @@ async def callbacks(client, callback_query):
         await message.reply('شما هنوز در این ربات ثبت نام نکرده اید. از این دستور برای شروع ربات استفاده کنید /start')
 
 
-@bot.on_message(filters.private & filters.regex('/edit'))
-async def edit_image(client, message):
-    #edit both files
-    chat_id = message.chat.id
-    person_img = f'{root}{chat_id}/person.jpg'
-    garment_img = f'{root}{chat_id}/garment.jpg'
 
-    if(os.path.exists(person_img)):
-        os.remove(person_img)
-    if(os.path.exists(garment_img)):
-        os.remove(garment_img)
+@bot.on_message(filters.private & filters.regex('/credits'))
+async def get_credits(client, message):
+    key = message.text.replace('/credits', '')
+    credit = credits(key)
+    message.replace(credit)
 
-    await message.reply('Ok, Please me a photo of the person you want to try on it.')
-
-@bot.on_message(filters.private & filters.regex('/imagine_'))
-async def imagine(client, message):
-
-    chat_id = message.chat.id
-    person_img = f'{root}{chat_id}/person.jpg'
-    garment_img = f'{root}{chat_id}/garment.jpg'
-    description = ''
-    garment_type = ''#upper_body lower_body dress
-
-    if(message.text.startswith('/imagine_upper')): 
-        garment_type = 'upper_body'
-        description = message.text.replace('/imagine_upper', '')
-
-    elif(message.text.startswith('/imagine_lower')): 
-        garment_type = 'lower_body'
-        description = message.text.replace('/imagine_lower', '')
-
-    elif(message.text.startswith('/imagine_dress')): 
-        garment_type = 'dress'
-        description = message.text.replace('/imagine_dress', '')
-
-    if(os.path.exists(person_img) and os.path.exists(garment_img)):
-        if(description and garment_type):
-            #generate image
-            person_url = upload(person_img)
-            garment_url = upload(garment_img)
-            # await message.reply(person_url)
-            # await message.reply(garment_url)
-            await message.reply(f'Generating your image**{description}**, it can take up to 1 min, Please wait')
-
-            img, msk = tryon(person_url, garment_url, description, garment_type)
-            downloaded_path = download_image(img, chat_id)
-            await client.send_photo(chat_id, downloaded_path, caption='You generated image')
-
-            resized = resize_image(person_img ,downloaded_path)
-            await client.send_photo(chat_id, resized, caption='your resized image')
-
-            # await message.reply(img)
-            # await message.reply(msk)
-
-        else:
-            await message.reply('You should send description for the garment with this format : /imagine_upper black shirt')
-    else:
-        await message.reply('You should submit both person and garment images, Use /images to check ')
-    
-@bot.on_message(filters.private & filters.regex('/images'))
-async def images(client, message):
-    chat_id = message.chat.id
-    person_img = f'{root}{chat_id}/person.jpg'
-    garment_img = f'{root}{chat_id}/garment.jpg'
-
-    if(os.path.exists(person_img)):
-        await client.send_photo(chat_id, person_img, caption='your person image')
-    if(os.path.exists(garment_img)):
-        await client.send_photo(chat_id, garment_img, caption='your garment image')
-    if(not os.path.exists(person_img) and not os.path.exists(garment_img)):
-        await message.reply('No images has been submitted, Send person image.')
-
-
-@bot.on_message(filters.private & filters.regex('/save'))
-async def save(client, message):
-    chat_id = message.chat.id
-    url = message.text.split(' ')[1]
-
-    downloaded_path = download_image(url, chat_id)
-    await client.send_photo(chat_id, downloaded_path, caption='your image')
-
-@bot.on_message(filters.private & filters.regex('/resize'))
-async def resize(client, message):
-    chat_id = message.chat.id
-    person_img = f'{root}{chat_id}/person.jpg'
-    garment_img = f'{root}{chat_id}/garment.jpg'
-    target = 'outputs/791927771-1.jpg'
-
-    resized = resize_image(person_img, target)
-    await client.send_photo(chat_id, resized, caption='resized image')
-
-def download_image(url, id):
-    response = requests.get(url)
-    image = Image.open(BytesIO(response.content))
-
-    count = len(os.listdir('outputs/')) + 1
-    filename = f"outputs/{id}-{count}.jpg"
-
-    image.save(filename)
-    print(f'Image successfully downloaded and saved as {filename}')
-
-    return filename
-
-def resize_image(target, source):
-    # Open the target image and the source image
-    target_image = Image.open(target)
-    source_image = Image.open(source)
-
-    # Get the size of the target image
-    target_size = target_image.size
-
-    # Resize the source image to match the size of the target image
-    resized_source_image = source_image.resize(target_size)
-
-    # Save the resized image (optional)
-    resized_source_image.save(source)
-
-    # Display the resized image (optional)
-    resized_source_image.show()
-
-    return(source)
 bot.run()

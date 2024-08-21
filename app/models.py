@@ -3,8 +3,7 @@ import fal_client
 import requests
 import os
 
-api = 'c57a1aa2-365a-4111-aa93-329b0658332c:122e40e0a920017aa9e4e1e326fd5fb8'
-api2 = 'ca1e6de6-533c-4d22-b7e5-674b57ccd170:6473ab54a90880944c69b77d25e7271a'
+api = '8a3b414e-f7d8-47ae-84cc-29902ee6c375:b0b0e4c524651e961df4d9c19cd5d494'
 os.environ['FAL_KEY'] = api
 
 def upload(image_address):
@@ -38,26 +37,9 @@ def swap(base, face):
 
     return result
 
-def tryon(person, garment, description, type):
-    result = fal_client.run(
-        "fal-ai/idm-vton",
-        arguments={
-            "human_image_url": person,
-            "garment_image_url": garment,
-            "description": description,
-            "garment_type" : type
-        },
-    )
-
-    export = [
-        result['image']['url'],
-        result['mask']['url']
-    ]
-    
-    return export
 
 def change_api(key):
-    os.environ['FAL_KEY'] = api
+    os.environ['FAL_KEY'] = key
 
     
 def clarity_upscale(img):
@@ -139,3 +121,5 @@ def credits(key):
     except requests.RequestException as e:
         print(f"An error occurred: {str(e)}")
         return None
+
+ 

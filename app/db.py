@@ -79,6 +79,37 @@ def add_request(req_id, t_id):
     except (Exception, psycopg2.Error) as error:
         print("Error while connecting to PostgreSQL", error)
 
+def add_job(t_id, job):
+    try:
+        t_id = str(t_id)
+        # Connect to your PostgreSQL database
+        conn = psycopg2.connect(**conn_params)
+        # Create a cursor object
+        cursor = conn.cursor()
+
+        # Define the insert query and data
+        insert_query = """
+        INSERT INTO jobs (t_id, job)
+        VALUES (%s, %s);
+        """
+        data_to_insert = (t_id, job)
+
+        # Execute the insert query
+        cursor.execute(insert_query, data_to_insert)
+
+        # Commit the transaction
+        conn.commit()
+
+        print("Data inserted successfully")
+
+        # Remember to close the cursor and connection
+        cursor.close()
+        conn.close()
+        print("PostgreSQL connection is closed")
+
+    except (Exception, psycopg2.Error) as error:
+        print("Error while connecting to PostgreSQL", error)
+
 def get_user(t_id):
     try:
         t_id = str(t_id)
