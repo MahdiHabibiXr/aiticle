@@ -101,8 +101,6 @@ async def callbacks(client, callback_query):
                     db.update_user(chat_id, 'image_path', url)
                     db.update_user(chat_id, 'in_progress', True)
 
-                    # req_id, key = clarity_upscale(url)
-                    # db.add_request(req_id, chat_id)
                     db.add_job(chat_id, 'clarity')
                     await message.reply("✅درخواست شما ثبت شد\nلطفا کمی منتظر باشید.")
                     
