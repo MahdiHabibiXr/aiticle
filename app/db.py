@@ -249,6 +249,23 @@ def user_exists(t_id):
         print(f"Error while connecting to PostgreSQL: {error}")
         return False
 
+def get_all_requests():
+    try:
+        conn = psycopg2.connect(**conn_params)
+        cursor = conn.cursor()
+
+        query = "SELECT * FROM requests WHERE completed = FALSE;"
+        cursor.execute(query)
+        requests = cursor.fetchall()
+
+        cursor.close()
+        conn.close()
+
+        return requests
+
+    except (Exception, psycopg2.Error) as error:
+        print(f"Error while connecting to PostgreSQL: {error}")
+        return []
 
 # add_user('274859', 'img/ai/im.png', '123456', 0)
 # get_user('274859')

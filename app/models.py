@@ -4,7 +4,7 @@ import requests
 import os
 
 api = 'c57a1aa2-365a-4111-aa93-329b0658332c:122e40e0a920017aa9e4e1e326fd5fb8'
-
+api2 = 'ca1e6de6-533c-4d22-b7e5-674b57ccd170:6473ab54a90880944c69b77d25e7271a'
 os.environ['FAL_KEY'] = api
 
 def upload(image_address):
@@ -15,7 +15,6 @@ def upload(image_address):
     url = fal_client.upload(file, "image/jpeg")
 
     return url
-
 
 def sdxl(prompt):
     result = fal_client.run(
@@ -60,8 +59,6 @@ def tryon(person, garment, description, type):
 def change_api(key):
     os.environ['FAL_KEY'] = api
 
-#TODO: I should get the remaining credit of any api
-#def get_credit(key):
     
 def clarity_upscale(img):
     handler = fal_client.submit(
@@ -120,3 +117,25 @@ def get_result(model_id, req_id):
         return response.text
 
 
+def credits(key):
+
+    url = "https://rest.alpha.fal.ai/billing/user_balance"
+    headers = {
+        'Authorization': f'Key {key}',
+    }
+
+    try:
+        # Make the GET request to the endpoint
+        response = requests.get(url, headers=headers)
+        
+        # Check if the request was successful
+        if response.status_code == 200:
+            data = response.json()
+
+            return data
+        else:
+            print(f"Failed to retrieve credits: {response.status_code} - {response.text}")
+            return None
+    except requests.RequestException as e:
+        print(f"An error occurred: {str(e)}")
+        return None
