@@ -222,6 +222,31 @@ def update_request(req_id, column_name, value):
     except (Exception, psycopg2.Error) as error:
         print(f"Error while connecting to PostgreSQL: {error}")
 
+def update_job(id, column_name, value):
+    try:
+        # Connect to your PostgreSQL database
+        conn = psycopg2.connect(**conn_params)
+        # Create a cursor object
+        cursor = conn.cursor()
+
+        # Construct the SQL query dynamically
+        query = f"UPDATE requests SET {column_name} = %s WHERE id = %s"
+
+        # Execute the query with the provided value and t_id
+        cursor.execute(query, (value, id))
+
+        # Commit the transaction
+        conn.commit()
+
+        print(f"Value '{value}' added to column '{column_name}' in table 'requests' for id '{id}'")
+
+        # Close the cursor and connection
+        cursor.close()
+        conn.close()
+
+    except (Exception, psycopg2.Error) as error:
+        print(f"Error while connecting to PostgreSQL: {error}")
+
 def null(t_id, column_name, conn_params):
     try:
         t_id = str(t_id)
@@ -298,5 +323,22 @@ def get_all_requests():
         print(f"Error while connecting to PostgreSQL: {error}")
         return []
 
+def get_all_jobs():
+    try:
+        conn = psycopg2.connect(**conn_params)
+        cursor = conn.cursor()
+
+        query = "SELECT * FROM jobs WHERE done = FALSE;"
+        cursor.execute(query)
+        requests = cursor.fetchall()
+
+        cursor.close()
+        conn.close()
+
+        return requests
+
+    except (Exception, psycopg2.Error) as error:
+        print(f"Error while connecting to PostgreSQL: {error}")
+        return []
 # add_user('274859', 'img/ai/im.png', '123456', 0)
 # get_user('274859')

@@ -4,3 +4,4 @@ pillow
 fal-client
 requests
 psycopg2-binary
+schedule
