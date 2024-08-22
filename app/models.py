@@ -52,14 +52,14 @@ def clarity_upscale(img):
     return handler.request_id
 
 def clarity_upscale_run(img):
-    handler = fal_client.run(
+    result = fal_client.run(
         "fal-ai/clarity-upscaler",
         arguments={
             "image_url": img
         },
     )
-    return handler.request_id
-    # return result['image']['url']
+    # return handler.request_id
+    return result['image']['url']
 
 
 def tryon_sub():
