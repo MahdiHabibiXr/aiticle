@@ -98,10 +98,10 @@ async def callbacks(client, callback_query):
                     await message.delete()
 
                     url = upload(photo)
-                    db.update_user(chat_id, 'image_path', url)
+                    # db.update_user(chat_id, 'image_path', url)
                     db.update_user(chat_id, 'in_progress', True)
 
-                    db.add_job(chat_id, 'clarity')
+                    db.add_task(chat_id, 'clarity', url)
                     await message.reply("✅درخواست شما ثبت شد\nلطفا کمی منتظر باشید.")
                     
             else:

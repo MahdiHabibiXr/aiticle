@@ -79,7 +79,7 @@ def add_request(req_id, t_id):
     except (Exception, psycopg2.Error) as error:
         print("Error while connecting to PostgreSQL", error)
 
-def add_job(t_id, job):
+def add_task(t_id, job, img):
     try:
         t_id = str(t_id)
         # Connect to your PostgreSQL database
@@ -89,10 +89,10 @@ def add_job(t_id, job):
 
         # Define the insert query and data
         insert_query = """
-        INSERT INTO jobs (t_id, job)
+        INSERT INTO tasks (t_id, job, img)
         VALUES (%s, %s);
         """
-        data_to_insert = (t_id, job)
+        data_to_insert = (t_id, job, img)
 
         # Execute the insert query
         cursor.execute(insert_query, data_to_insert)
@@ -222,7 +222,7 @@ def update_request(req_id, column_name, value):
     except (Exception, psycopg2.Error) as error:
         print(f"Error while connecting to PostgreSQL: {error}")
 
-def update_job(id, column_name, value):
+def update_task(id, column_name, value):
     try:
         # Connect to your PostgreSQL database
         conn = psycopg2.connect(**conn_params)
@@ -230,7 +230,7 @@ def update_job(id, column_name, value):
         cursor = conn.cursor()
 
         # Construct the SQL query dynamically
-        query = f"UPDATE requests SET {column_name} = %s WHERE id = %s"
+        query = f"UPDATE task SET {column_name} = %s WHERE id = %s"
 
         # Execute the query with the provided value and t_id
         cursor.execute(query, (value, id))
@@ -238,7 +238,7 @@ def update_job(id, column_name, value):
         # Commit the transaction
         conn.commit()
 
-        print(f"Value '{value}' added to column '{column_name}' in table 'requests' for id '{id}'")
+        print(f"Value '{value}' added to column '{column_name}' in table 'jobs' for id '{id}'")
 
         # Close the cursor and connection
         cursor.close()
@@ -323,12 +323,12 @@ def get_all_requests():
         print(f"Error while connecting to PostgreSQL: {error}")
         return []
 
-def get_all_jobs():
+def get_all_tasks():
     try:
         conn = psycopg2.connect(**conn_params)
         cursor = conn.cursor()
 
-        query = "SELECT * FROM jobs WHERE done = FALSE;"
+        query = "SELECT * FROM tasks WHERE done = FALSE;"
         cursor.execute(query)
         requests = cursor.fetchall()
 

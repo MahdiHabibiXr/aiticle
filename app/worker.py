@@ -1,54 +1,44 @@
+import schedule
 import time
-import db
-import models
-from pyrogram.types import ReplyKeyboardMarkup as Markup
+import db  
+import models 
 from pyrogram import Client, filters
 
-bot = Client('mahdi')
+# bot = Client('mahdi2',api_id=863373,api_hash='c9f8495ddd20615835d3fd073233a3f6' )
+bot = Client('mahdi2')
 
-def check_status(req_id):
-    """
-    Checks the status of a request using its req_id.
-    Returns the status of the request.
-    """
-    model_id = "clarity-upscaler"  # Example model_id; adjust based on your actual use
-    status = models.get_status(model_id, req_id)
-    return status
-
-def process_completed_request(req_id, user_id):
-    """
-    Processes a request that has been completed.
-    Update user and request status in the database.
-    """
-    # Retrieve the request result
-    model_id = "clarity-upscaler"  # Example model_id; adjust based on your actual use
-    result = models.get_result(model_id, req_id)
-
-    # Handle the result (e.g., notify the user, update the database)
-    print(f"Request {req_id} completed. Result: {result}")
-
-    # Update the request status in the database
-    db.update_request(req_id, 'completed', True)
+def check_and_update_tasks():
+    # Get all jobs from the database
+    tasks = db.get_all_jobs()
     
-    # Notify the user or update user record as needed
-    bot.send_message(user_id, f'your request is done\n{result}')
-    # Example: You can use a notification system or send messages through Telegram API
+    for task in tasks:
+        # Get the current status of the job
+        user = task[1]
+        job_type = task[2]
+        user_image = task[4]
+        print(f'Running {job_type} for {user}')
 
-def main():
-    while True:
-        # Fetch all requests that are not completed
-        requests = db.get_all_requests()  # Implement this function in db.py
+        try:
+            models.clarity_upscale_run()
+            with bot:
+                bot.send_message(int(user), 'عکس شما با موفقیت ساخته شد، بفرمایید :')
+            # bot.send_photo(int(user), user_image)
 
-        for request in requests:
-            req_id = request[1]
-            user_id = request[3]
-            status = check_status(req_id)
+            print(f"Job {task[0]} done. Going to change it into the database")
+            db.update_task(task[0], 'done', True)
+            db.update_user(user, 'in_progress', False)
 
-            if status['status'] == 'COMPLETED':  # Adjust based on the actual status response
-                process_completed_request(req_id, user_id)
+        except Exception as error:
+            print(error)
+            with bot:
+                bot.send_message('791927771', error)
 
-        # Sleep for a while before checking again (e.g., 5 minutes)
-        time.sleep(300)
+# Schedule the task to run every 5 minutes
+schedule.every(5).minutes.do(check_and_update_tasks)
 
-if __name__ == "__main__":
-    main()
+print("Job scheduler started. Checking jobs every 5 minutes...")
+
+# Keep the script running
+while True:
+    schedule.run_pending()
+    time.sleep(1)
