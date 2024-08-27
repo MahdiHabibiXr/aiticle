@@ -19,9 +19,11 @@ def check_and_update_tasks():
         print(f'Running {job_type} for {user}')
 
         try:
-            models.clarity_upscale_run()
+            result = models.clarity_upscale_run()
             with bot:
                 bot.send_message(int(user), 'عکس شما با موفقیت ساخته شد، بفرمایید :')
+                bot.send_photo(int(user), result, 'ساخته شده با عکسیفای')
+                
             # bot.send_photo(int(user), user_image)
 
             print(f"Job {task[0]} done. Going to change it into the database")
